@@ -1,0 +1,18 @@
+GEM
+  specs:
+    ansi (1.4.3)
+    builder (3.1.4)
+    minitest (5.3.3)
+    minitest-reporters (1.0.3)
+      ansi
+      builder
+      minitest (>= 5.0)
+      ruby-progressbar
+    ruby-progressbar (1.4.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  minitest
+  minitest-reporters

@@ -5,7 +5,11 @@ class ShipmentBuilder
   # drop-shipped from a vendors warehouse.
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def build_shipments( order_line_items, consolidate=false )
+  def initialize(order_line_items, consolidate = false)
+    build_shipments(order_line_items, consolidate)
+  end
+
+  def build_shipments( order_line_items, consolidate)
     shipments = []
 
     unless consolidate
