@@ -13,7 +13,6 @@ class ShipmentBuilder
       line_items = []
       order_line_items.each do |order_line_item|
         item = order_line_item.item_id ? Item.find(order_line_item.item_id, :include => :product) : UsedItem.find(order_line_item.used_item_id)
-        RAILS_DEFAULT_LOGGER.info("Build shipments found item: #{item.inspect} from store #{item.store_id}")
         ship_status_symbol = item.shipping_status_symbol_for_quantity(order_line_item.quantity)
         ship_status_symbol = :in_stock if [:closeout_instock,:from_stock_only_instock].include?(ship_status_symbol)
         line_items << OpenStruct.new( :ship_status_symbol => ship_status_symbol,
@@ -32,7 +31,6 @@ class ShipmentBuilder
       end
 
       if line_items_by_sym[:in_stock].length > 0 && line_items_by_sym[:drop_ship].length > 0
-        RAILS_DEFAULT_LOGGER.debug("Attempting to consolidate in_stocks and drop_ships.")
         # If we've got us some in_stocks and some drop_ships, let's see if
         # we can do some consolidating. It only makes sense to consolidate if we can completely
         # get rid of in_stocks.
@@ -41,7 +39,6 @@ class ShipmentBuilder
           li.consolidatable = (matching_ds && li.drop_shippable)
         end
         if line_items_by_sym[:in_stock].count{|li| !li.consolidatable} < 1
-          RAILS_DEFAULT_LOGGER.debug("Consolidating in_stocks and drop_ships.")
           #Woo-hoo! Let's consolidate
           line_items.each{|li| li.ship_status_symbol = :drop_ship if li.ship_status_symbol == :in_stock}
         end
@@ -61,16 +58,10 @@ class ShipmentBuilder
 
     set_consolidate_flags( shipments )
 
-    RAILS_DEFAULT_LOGGER.info "====================================================="
-    RAILS_DEFAULT_LOGGER.info "Shipments"
-    RAILS_DEFAULT_LOGGER.info "====================================================="
-    RAILS_DEFAULT_LOGGER.info "#{shipments.inspect}"
-    RAILS_DEFAULT_LOGGER.info "====================================================="
     return shipments
   end
 
   def set_consolidate_flags( shipments )
-    #RAILS_DEFAULT_LOGGER.debug shipments.to_yaml
     # Now let's set appropriate consolidate flags on the shipments that are to be shipped together (NEML & NEHP)
     in_stock = []
     order_in = []
@@ -87,9 +78,6 @@ class ShipmentBuilder
     # NEMX_TODO - Make this more robust if we need to combine with NEMX in the future.
     groups = [in_stock, order_in, consol]
     groups.each do |g|
-      #RAILS_DEFAULT_LOGGER.debug "================================================================"
-      #RAILS_DEFAULT_LOGGER.debug "Group #{g.inspect}"
-      #RAILS_DEFAULT_LOGGER.debug "================================================================"
       if g.length == 2
         # We can assume here that shipper_id == store_id always because a drop-ship from one store
         # will never be combined with a drop-ship from another store.  If shipment was drop-shipped
