@@ -60,43 +60,7 @@ class ShipmentBuilder
       end
     end
 
-    set_consolidate_flags( shipments )
-
     return shipments
-  end
-
-  def set_consolidate_flags( shipments )
-    # Now let's set appropriate consolidate flags on the shipments that are to be shipped together (NEML & NEHP)
-    in_stock = []
-    order_in = []
-    consol   = []
-    shipments.each do |s|
-      if s.shipment_type == Shipment::IN_STOCK
-        in_stock << s
-      elsif s.shipment_type == Shipment::ORDER_IN
-        order_in << s
-      elsif s.shipment_type == Shipment::CONSOLIDATED
-        consol << s
-      end
-    end
-    # NEMX_TODO - Make this more robust if we need to combine with NEMX in the future.
-    groups = [in_stock, order_in, consol]
-    groups.each do |g|
-      if g.length == 2
-        # We can assume here that shipper_id == store_id always because a drop-ship from one store
-        # will never be combined with a drop-ship from another store.  If shipment was drop-shipped
-        # shipper_id == vendor_id.
-        if g[1].shipper_id == 1
-          g[0].combine_flag = "combine"
-          g[1].combine_flag = "has_combined_shipment"
-          g[1].combine_with_shipment = g[0]
-        else
-          g[1].combine_flag = "combine"
-          g[0].combine_flag = "has_combined_shipment"
-          g[0].combine_with_shipment = g[1]
-        end
-      end
-    end
   end
 
   def create_group_if_necessary_and_insert( shipments, key, store_id, shipper_id, order_line_item)
