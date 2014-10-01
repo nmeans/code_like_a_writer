@@ -2,8 +2,18 @@ GEM
   remote: https://rubygems.org/
   specs:
     ansi (1.4.3)
+    axiom-types (0.1.1)
+      descendants_tracker (~> 0.0.4)
+      ice_nine (~> 0.11.0)
+      thread_safe (~> 0.3, >= 0.3.1)
     builder (3.1.4)
     coderay (1.0.9)
+    coercible (1.0.0)
+      descendants_tracker (~> 0.0.1)
+    descendants_tracker (0.0.4)
+      thread_safe (~> 0.3, >= 0.3.1)
+    equalizer (0.0.9)
+    ice_nine (0.11.0)
     method_source (0.8.2)
     minitest (5.3.3)
     minitest-emoji (2.0.0)
@@ -18,6 +28,12 @@ GEM
       slop (~> 3.4)
     ruby-progressbar (1.4.2)
     slop (3.4.6)
+    thread_safe (0.3.4)
+    virtus (1.0.3)
+      axiom-types (~> 0.1)
+      coercible (~> 1.0)
+      descendants_tracker (~> 0.0, >= 0.0.3)
+      equalizer (~> 0.0, >= 0.0.9)
 
 PLATFORMS
   ruby
@@ -27,3 +43,4 @@ DEPENDENCIES
   minitest-emoji
   minitest-reporters
   pry
+  virtus
