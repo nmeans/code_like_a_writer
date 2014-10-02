@@ -18,8 +18,7 @@ class ShipmentBuilder
                                       :store_id => order_line_item.store_id,
                                       :vendor_id => order_line_item.vendor_id,
                                       :line_item => order_line_item,
-                                      :drop_shippable => order_line_item.drop_shippable?,
-                                      :consolidatable => false)
+                                      :drop_shippable => order_line_item.drop_shippable? )
       end
 
 

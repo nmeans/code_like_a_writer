@@ -1,6 +1,14 @@
 require 'virtus'
 class MockOrderLineItem
   include Virtus.model
+
+  attr_accessor :consolidatable
+
+  def initialize(*args)
+    super(*args)
+    @consolidatable = false
+  end
+
   attribute :ship_status, Symbol
   attribute :store_id, Integer
   attribute :vendor_id, Integer
