@@ -14,9 +14,7 @@ class ShipmentBuilder
       # Build a hash of line items with associated data we can use without having to re-query the database for all the iterations.
       line_items = []
       order_line_items.each do |order_line_item|
-        ship_status_symbol = order_line_item.ship_status
-        ship_status_symbol = :in_stock if [:closeout_instock,:from_stock_only_instock].include?(ship_status_symbol)
-        line_items << OpenStruct.new( :ship_status_symbol => ship_status_symbol,
+        line_items << OpenStruct.new( :ship_status_symbol => order_line_item.ship_status,
                                       :store_id => order_line_item.store_id,
                                       :vendor_id => order_line_item.vendor_id,
                                       :line_item => order_line_item,
