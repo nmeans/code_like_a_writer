@@ -6,7 +6,12 @@ require 'ostruct'
 describe ShipmentBuilder do
 
   it "returns a single consolidated shipment when consolidate is true" do
-    shipments = ShipmentBuilder.new.build_shipments([mock_order_line_item, mock_order_line_item], true)
+    order_line_items = [
+      mock_order_line_item(ship_status: :in_stock),
+      mock_order_line_item(ship_status: :drop_ship),
+      mock_order_line_item(ship_status: :order_in),
+    ]
+    shipments = ShipmentBuilder.new.build_shipments(order_line_items, true)
     shipments.length.must_equal 1
   end
 
