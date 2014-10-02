@@ -18,6 +18,6 @@ describe ShipmentBuilder do
 
 end
 
-def mock_order_line_item(ship_status = :in_stock, store_id = 1)
-  MockOrderLineItem.new(ship_status: ship_status, store_id: store_id)
+def mock_order_line_item(ship_status = :in_stock, store_id = 1, vendor_id = 1)
+  MockOrderLineItem.new(ship_status: ship_status, store_id: store_id, vendor_id: 1)
 end
