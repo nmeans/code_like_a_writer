@@ -44,12 +44,19 @@ class ShipmentBuilder
                                               li.ship_status == :drop_ship ? li.vendor_id : li.store_id, li )
       end
     else
-      line_items.each do |line_item|
-        create_group_if_necessary_and_insert( shipments, :consolidated, line_item.store_id, line_item.store_id, line_item)
-      end
+      return [single_consolidated_shipment]
     end
 
     return shipments
+  end
+
+  def single_consolidated_shipment
+    Shipment.new(
+      :shipment_type => :consolidated,
+      :store_id => 1,
+      :shipper_id => 1,
+      :line_items => line_items,
+    )
   end
 
   def create_group_if_necessary_and_insert( shipments, key, store_id, shipper_id, line_item)
