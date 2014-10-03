@@ -7,7 +7,14 @@ class ShipmentBuilder
   # drop-shipped from a vendors warehouse.
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def build_shipments(line_items, consolidate = false)
+  attr_reader :line_items, :consolidate
+
+  def initialize(line_items, consolidate = false)
+    @line_items = line_items
+    @consolidate = consolidate
+  end
+
+  def build_shipments
     shipments = []
 
     unless consolidate
