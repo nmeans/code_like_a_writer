@@ -1,7 +1,9 @@
-class Shipment
-  attr_accessor :shipment_type, :shipper_id, :store_id, :line_items
+require 'virtus'
 
-  def initialize
-    @line_items = []
-  end
+class Shipment
+  include Virtus.model
+  attribute :shipment_type, Symbol
+  attribute :shipper_id, Integer
+  attribute :store_id, Integer
+  attribute :line_items, Array
 end
