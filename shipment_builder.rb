@@ -22,11 +22,7 @@ class ShipmentBuilder
       # If we've got us some in_stocks and some drop_ships, let's see if
       # we can do some consolidating. It only makes sense to consolidate if we can completely
       # get rid of in_stocks.
-      in_stock_items.each do |li|
-        matching_ds = drop_ship_items.count{|dsli| dsli.vendor_id == li.vendor_id} > 0
-        li.consolidatable = (matching_ds && li.drop_shippable)
-      end
-      if in_stock_items.count{|li| !li.consolidatable} < 1
+      if consolidate_all_in_stock_to_drop_ship?
         #Woo-hoo! Let's consolidate
         line_items.each{|li| li.ship_status = :drop_ship if li.ship_status == :in_stock}
       end
@@ -45,6 +41,11 @@ class ShipmentBuilder
     define_method "#{stock_status}_items" do                 # def in_stock_items
       line_items.select{|li| li.ship_status == stock_status} #   line_items.select{|li| li.ship_status == :in_stock}
     end                                                      # end
+  end
+
+  def consolidate_all_in_stock_to_drop_ship?
+    return false unless in_stock_items.all?(&:drop_shippable)
+    (in_stock_items.map(&:vendor_id) - drop_ship_items.map(&:vendor_id)).empty?
   end
 
   def single_consolidated_shipment
