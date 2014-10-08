@@ -16,7 +16,9 @@ class ShipmentBuilder
   end
 
   def build_shipments
-    return [single_consolidated_shipment] if consolidate
+    if consolidate
+      line_items.each{|li| li.ship_status = :consolidated}
+    end
 
     if consolidate_all_in_stock_to_drop_ship?
       in_stock_items.each{|li| li.ship_status = :drop_ship}
@@ -39,15 +41,6 @@ class ShipmentBuilder
   def consolidate_all_in_stock_to_drop_ship?
     return false unless in_stock_items.all?(&:drop_shippable)
     (in_stock_items.map(&:vendor_id) - drop_ship_items.map(&:vendor_id)).empty?
-  end
-
-  def single_consolidated_shipment
-    Shipment.new(
-      :shipment_type => :consolidated,
-      :store_id => 1,
-      :shipper_id => 1,
-      :line_items => line_items,
-    )
   end
 
   def create_group_if_necessary_and_insert( shipments, key, store_id, shipper_id, line_item)
