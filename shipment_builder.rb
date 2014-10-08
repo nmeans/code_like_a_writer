@@ -18,15 +18,8 @@ class ShipmentBuilder
   def build_shipments
     return [single_consolidated_shipment] if consolidate
 
-    if in_stock_items.length > 0 && drop_ship_items.length > 0
-      # If we've got us some in_stocks and some drop_ships, let's see if
-      # we can do some consolidating. It only makes sense to consolidate if we can completely
-      # get rid of in_stocks.
-      if consolidate_all_in_stock_to_drop_ship?
-        #Woo-hoo! Let's consolidate
-        line_items.each{|li| li.ship_status = :drop_ship if li.ship_status == :in_stock}
-      end
-
+    if consolidate_all_in_stock_to_drop_ship?
+      in_stock_items.each{|li| li.ship_status = :drop_ship}
     end
 
     line_items.each do |li|
