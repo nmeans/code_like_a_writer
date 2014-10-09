@@ -48,18 +48,19 @@ class ShipmentBuilder
     if matching_shipment
       matching_shipment.line_items << line_item
     else
-      shipment = Shipment.new
-      shipment.shipment_type = key
-      shipment.vendor_id = shipper_id
-      shipment.store_id = store_id
+      shipment = create_shipment(key, shipper_id)
       shipment.line_items << line_item
-      shipments << shipment
     end
   end
 
   def find_shipment(type, shipper_id)
     shipments.find do |shipment|
-      shipment.shipment_type == type && shipment.vendor_id == shipper_id
+      shipment.shipment_type == type && shipment.shipper_id == shipper_id
     end
+  end
+
+  def create_shipment(type, shipper_id)
+    shipments << new_shipment = Shipment.new(shipment_type: type, shipper_id: shipper_id, store_id: 1)
+    new_shipment
   end
 end
