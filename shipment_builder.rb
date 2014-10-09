@@ -44,13 +44,8 @@ class ShipmentBuilder
   end
 
   def create_group_if_necessary_and_insert( shipments, key, store_id, shipper_id, line_item)
-    matching_shipment = find_shipment(key, shipper_id)
-    if matching_shipment
-      matching_shipment.line_items << line_item
-    else
-      shipment = create_shipment(key, shipper_id)
-      shipment.line_items << line_item
-    end
+    matching_shipment = find_shipment(key, shipper_id) || create_shipment(key, shipper_id)
+    matching_shipment.line_items << line_item
   end
 
   def find_shipment(type, shipper_id)
