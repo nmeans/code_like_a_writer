@@ -44,20 +44,22 @@ class ShipmentBuilder
   end
 
   def create_group_if_necessary_and_insert( shipments, key, store_id, shipper_id, line_item)
-    found = false
-    shipments.each do |shipment|
-      if shipment.shipment_type == key && shipment.shipper_id == shipper_id
-        shipment.line_items << line_item
-        found = true
-      end
-    end
-    if found == false
+    matching_shipment = find_shipment(key, shipper_id)
+    if matching_shipment
+      matching_shipment.line_items << line_item
+    else
       shipment = Shipment.new
       shipment.shipment_type = key
-      shipment.shipper_id = shipper_id
+      shipment.vendor_id = shipper_id
       shipment.store_id = store_id
       shipment.line_items << line_item
       shipments << shipment
+    end
+  end
+
+  def find_shipment(type, shipper_id)
+    shipments.find do |shipment|
+      shipment.shipment_type == type && shipment.vendor_id == shipper_id
     end
   end
 end
