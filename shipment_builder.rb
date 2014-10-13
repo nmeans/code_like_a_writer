@@ -16,6 +16,13 @@ class ShipmentBuilder
   end
 
   def build_shipments
+    optimize_ship_statuses
+    line_items.each { |li| assign_to_shipment(li) }
+
+    return shipments
+  end
+
+  def optimize_ship_statuses
     if consolidate_to_single_shipment
       line_items.each{|li| li.ship_status = :consolidated}
     end
@@ -23,13 +30,6 @@ class ShipmentBuilder
     if consolidate_all_in_stock_to_drop_ship?
       in_stock_items.each{|li| li.ship_status = :drop_ship}
     end
-
-    line_items.each do |li|
-      create_group_if_necessary_and_insert( shipments, li.ship_status, li.store_id,
-                                            li.ship_status == :drop_ship ? li.vendor_id : li.store_id, li )
-    end
-
-    return shipments
   end
 
   [:in_stock, :drop_ship, :order_in].each do |stock_status|
@@ -43,14 +43,18 @@ class ShipmentBuilder
     (in_stock_items.map(&:vendor_id) - drop_ship_items.map(&:vendor_id)).empty?
   end
 
-  def create_group_if_necessary_and_insert( shipments, key, store_id, shipper_id, line_item)
-    matching_shipment = find_shipment(key, shipper_id) || create_shipment(key, shipper_id)
-    matching_shipment.line_items << line_item
+  def assign_to_shipment(line_item)
+    shipment = find_or_create_shipment(line_item.ship_status, line_item.vendor_id)
+    shipment.line_items << line_item
+  end
+
+  def find_or_create_shipment(type, shipper_id)
+    find_shipment(type, shipper_id) || create_shipment(type, shipper_id)
   end
 
   def find_shipment(type, shipper_id)
     shipments.find do |shipment|
-      shipment.shipment_type == type && shipment.shipper_id == shipper_id
+      shipment.shipment_type == type && (shipment.shipper_id == shipper_id || shipment.shipment_type != :drop_ship)
     end
   end
 
