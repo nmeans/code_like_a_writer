@@ -4,13 +4,27 @@ require 'ostruct'
 
 describe ShipmentBuilder do
 
-  it "returns a single consolidated shipment when consolidate is true" do
-    sb = ShipmentBuilder.new([mock_order_line_item, mock_order_line_item], true)
-    sb.length.must_equal 1
+  before { Object.send(:const_set, :Shipment, ShipmentDouble) }
+  after { Object.send(:remove_const, :Shipment) }
+
+  it "executes when consoildate is false" do
+    assert ShipmentBuilder.new([order_line_item_double])
+  end
+
+  it "executes when consoildate is true" do
+    assert ShipmentBuilder.new([order_line_item_double], true)
   end
 
 end
 
-def mock_order_line_item
-  OpenStruct.new()
+def order_line_item_double
+  OpenStruct.new(:item_id => 1, :store_id => 1, :vendor_id => 1, :drop_shippable? => true,
+                 :ship_status_symbol => :in_stock)
+end
+
+class ShipmentDouble < OpenStruct
+  def initialize(*)
+    super
+    self.line_items = []
+  end
 end
