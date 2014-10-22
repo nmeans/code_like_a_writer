@@ -5,13 +5,13 @@ require 'ostruct'
 describe ShipmentBuilder do
 
   before { Object.send(:const_set, :Shipment, ShipmentDouble) }
-  after { Object.send(:remove_const, :Shipment) }
+  after  { Object.send(:remove_const, :Shipment) }
 
-it "returns a single consolidated shipment when consolidate is true" do
+  it "returns a single consolidated shipment when consolidate is true" do
     line_items = [
-      line_item_double(ship_status_symbol: :in_stock),
-      line_item_double(ship_status_symbol: :drop_ship),
-      line_item_double(ship_status_symbol: :order_in),
+      line_item_double(ship_status: :in_stock),
+      line_item_double(ship_status: :drop_ship),
+      line_item_double(ship_status: :order_in),
     ]
     shipments = ShipmentBuilder.new(line_items, true).build_shipments
     shipments.length.must_equal 1
@@ -25,10 +25,10 @@ it "returns a single consolidated shipment when consolidate is true" do
 
   it "returns multiple shipments when types and vendors differ" do
     line_items = [
-      line_item_double(ship_status_symbol: :in_stock),
-      line_item_double(ship_status_symbol: :drop_ship, vendor_id: 9),
-      line_item_double(ship_status_symbol: :drop_ship, vendor_id: 10),
-      line_item_double(ship_status_symbol: :order_in),
+      line_item_double(ship_status: :in_stock),
+      line_item_double(ship_status: :drop_ship, vendor_id: 9),
+      line_item_double(ship_status: :drop_ship, vendor_id: 10),
+      line_item_double(ship_status: :order_in),
     ]
     shipments = ShipmentBuilder.new(line_items).build_shipments
     shipments.length.must_equal 4
@@ -37,8 +37,8 @@ it "returns a single consolidated shipment when consolidate is true" do
 
   it "consolidates drop ship items from the same vendor" do
     line_items = [
-      line_item_double(ship_status_symbol: :drop_ship, vendor_id: 9),
-      line_item_double(ship_status_symbol: :drop_ship, vendor_id: 9),
+      line_item_double(ship_status: :drop_ship, vendor_id: 9),
+      line_item_double(ship_status: :drop_ship, vendor_id: 9),
     ]
     shipments = ShipmentBuilder.new(line_items).build_shipments
     shipments.length.must_equal 1
@@ -46,8 +46,8 @@ it "returns a single consolidated shipment when consolidate is true" do
 
   it "consolidates in_stock to drop_ship if all in_stock items can be consolidated" do
     line_items = [
-      line_item_double(ship_status_symbol: :in_stock, vendor_id: 9),
-      line_item_double(ship_status_symbol: :drop_ship, vendor_id: 9),
+      line_item_double(ship_status: :in_stock, vendor_id: 9),
+      line_item_double(ship_status: :drop_ship, vendor_id: 9),
     ]
     shipments = ShipmentBuilder.new(line_items).build_shipments
     shipments.length.must_equal 1
@@ -56,9 +56,9 @@ it "returns a single consolidated shipment when consolidate is true" do
 
   it "does not consolidate in_stock to drop ship if any in_stock items are not consolidatable" do
     line_items = [
-      line_item_double(ship_status_symbol: :in_stock, vendor_id: 9),
-      line_item_double(ship_status_symbol: :drop_ship, vendor_id: 9),
-      line_item_double(ship_status_symbol: :in_stock, vendor_id: 10),
+      line_item_double(ship_status: :in_stock, vendor_id: 9),
+      line_item_double(ship_status: :drop_ship, vendor_id: 9),
+      line_item_double(ship_status: :in_stock, vendor_id: 10),
     ]
     shipments = ShipmentBuilder.new(line_items).build_shipments
     shipments.length.must_equal 2
@@ -69,7 +69,7 @@ end
 
 def line_item_double(overrides = {})
   line_item_params = { :item_id => 1, :store_id => 1, :vendor_id => 1, :drop_shippable => true,
-                       :ship_status_symbol => :in_stock }.merge(overrides)
+                       :ship_status => :in_stock }.merge(overrides)
   OpenStruct.new(line_item_params)
 end
 
