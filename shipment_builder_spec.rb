@@ -68,7 +68,7 @@ it "returns a single consolidated shipment when consolidate is true" do
 end
 
 def order_line_item_double(overrides = {})
-  line_item_params = { :item_id => 1, :store_id => 1, :vendor_id => 1, :drop_shippable? => true,
+  line_item_params = { :item_id => 1, :store_id => 1, :vendor_id => 1, :drop_shippable => true,
                        :ship_status_symbol => :in_stock }.merge(overrides)
   OpenStruct.new(line_item_params)
 end

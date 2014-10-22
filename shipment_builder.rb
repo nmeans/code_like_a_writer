@@ -16,17 +16,8 @@ class ShipmentBuilder
     shipments = []
 
     unless consolidate
-      # Build a hash of line items with associated data we can use without having to re-query the database for all the iterations.
-      line_items = []
-      order_line_items.each do |order_line_item|
-        line_items << OpenStruct.new( :ship_status_symbol => order_line_item.ship_status_symbol,
-                                      :store_id => order_line_item.store_id,
-                                      :vendor_id => order_line_item.vendor_id,
-                                      :line_item => order_line_item,
-                                      :drop_shippable => order_line_item.drop_shippable?,
-                                      :consolidatable => false)
-      end
 
+      line_items = order_line_items
 
       # MAGIC GOES HERE TO DO THE CONSOLIDATION
       line_items_by_sym = {}
