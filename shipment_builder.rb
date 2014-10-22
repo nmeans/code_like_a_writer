@@ -31,10 +31,6 @@ class ShipmentBuilder
 
   def build_shipments_by_ship_status
     # MAGIC GOES HERE TO DO THE CONSOLIDATION
-    line_items_by_sym = {}
-    [:in_stock,:drop_ship,:order_in].each do |ship_sym|
-      line_items_by_sym[ship_sym] = line_items.select{|li| li.ship_status == ship_sym}
-    end
 
     if line_items_by_sym[:in_stock].length > 0 && line_items_by_sym[:drop_ship].length > 0
       # If we've got us some in_stocks and some drop_ships, let's see if
@@ -48,13 +44,20 @@ class ShipmentBuilder
         #Woo-hoo! Let's consolidate
         line_items.each{|li| li.ship_status = :drop_ship if li.ship_status == :in_stock}
       end
-
     end
 
     line_items.each do |li|
       create_group_if_necessary_and_insert( shipments, li.ship_status, li.store_id,
                                             li.ship_status == :drop_ship ? li.vendor_id : li.store_id, li.line_item )
     end
+  end
+
+  def line_items_by_sym
+    line_items_by_sym = {}
+    [:in_stock,:drop_ship,:order_in].each do |ship_sym|
+      line_items_by_sym[ship_sym] = line_items.select{|li| li.ship_status == ship_sym}
+    end
+    line_items_by_sym
   end
 
   def create_group_if_necessary_and_insert( shipments, key, store_id, shipper_id, order_line_item)
