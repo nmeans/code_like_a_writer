@@ -5,11 +5,14 @@ class ShipmentBuilder
   # drop-shipped from a vendors warehouse.
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  attr_reader :order_line_items, :consolidate
+
   def initialize(order_line_items, consolidate = false)
-    build_shipments(order_line_items, consolidate)
+    @order_line_items = order_line_items
+    @consolidate = consolidate
   end
 
-  def build_shipments( order_line_items, consolidate)
+  def build_shipments
     shipments = []
 
     unless consolidate
