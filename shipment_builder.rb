@@ -5,10 +5,10 @@ class ShipmentBuilder
   # drop-shipped from a vendors warehouse.
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  attr_reader :order_line_items, :consolidate
+  attr_reader :line_items, :consolidate
 
-  def initialize(order_line_items, consolidate = false)
-    @order_line_items = order_line_items
+  def initialize(line_items, consolidate = false)
+    @line_items = line_items
     @consolidate = consolidate
   end
 
@@ -16,8 +16,6 @@ class ShipmentBuilder
     shipments = []
 
     unless consolidate
-
-      line_items = order_line_items
 
       # MAGIC GOES HERE TO DO THE CONSOLIDATION
       line_items_by_sym = {}
@@ -45,8 +43,8 @@ class ShipmentBuilder
                                               li.ship_status_symbol == :drop_ship ? li.vendor_id : li.store_id, li.line_item )
       end
     else
-      order_line_items.each do |order_line_item|
-        create_group_if_necessary_and_insert( shipments, :consolidated, order_line_item.store_id, order_line_item.store_id, order_line_item)
+      line_items.each do |line_item|
+        create_group_if_necessary_and_insert( shipments, :consolidated, line_item.store_id, line_item.store_id, line_item)
       end
     end
 
