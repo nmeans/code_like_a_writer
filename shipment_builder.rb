@@ -31,11 +31,7 @@ class ShipmentBuilder
 
   def build_shipments_by_ship_status
     consolidate_to_drop_ships if consolidate_to_drop_ships?
-
-    line_items.each do |li|
-      create_group_if_necessary_and_insert( shipments, li.ship_status, li.store_id,
-                                            li.ship_status == :drop_ship ? li.vendor_id : li.store_id, li.line_item )
-    end
+    assign_items_to_shipments
   end
 
   def consolidate_to_drop_ships
@@ -57,6 +53,13 @@ class ShipmentBuilder
 
   def line_items_by_ship_status(status)
     line_items.select{|li| li.ship_status == status}
+  end
+
+  def assign_items_to_shipments
+    line_items.each do |li|
+      create_group_if_necessary_and_insert( shipments, li.ship_status, li.store_id,
+                                            li.ship_status == :drop_ship ? li.vendor_id : li.store_id, li.line_item )
+    end
   end
 
   def create_group_if_necessary_and_insert( shipments, key, store_id, shipper_id, order_line_item)
