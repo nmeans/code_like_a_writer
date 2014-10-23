@@ -32,15 +32,15 @@ class ShipmentBuilder
   def build_shipments_by_ship_status
     # MAGIC GOES HERE TO DO THE CONSOLIDATION
 
-    if line_items_by_ship_status(:in_stock).length > 0 && line_items_by_ship_status(:drop_ship).length > 0
+    if in_stock_items.length > 0 && drop_ship_items.length > 0
       # If we've got us some in_stocks and some drop_ships, let's see if
       # we can do some consolidating. It only makes sense to consolidate if we can completely
       # get rid of in_stocks.
-      line_items_by_ship_status(:in_stock).each do |li|
-        matching_ds = line_items_by_ship_status(:drop_ship).count{|dsli| dsli.vendor_id == li.vendor_id} > 0
+      in_stock_items.each do |li|
+        matching_ds = drop_ship_items.count{|dsli| dsli.vendor_id == li.vendor_id} > 0
         li.consolidatable = (matching_ds && li.drop_shippable)
       end
-      if line_items_by_ship_status(:in_stock).count{|li| !li.consolidatable} < 1
+      if in_stock_items.count{|li| !li.consolidatable} < 1
         #Woo-hoo! Let's consolidate
         line_items.each{|li| li.ship_status = :drop_ship if li.ship_status == :in_stock}
       end
@@ -50,6 +50,14 @@ class ShipmentBuilder
       create_group_if_necessary_and_insert( shipments, li.ship_status, li.store_id,
                                             li.ship_status == :drop_ship ? li.vendor_id : li.store_id, li.line_item )
     end
+  end
+
+  def in_stock_items
+    line_items_by_ship_status(:in_stock)
+  end
+
+  def drop_ship_items
+    line_items_by_ship_status(:drop_ship)
   end
 
   def line_items_by_ship_status(status)
