@@ -42,7 +42,7 @@ class ShipmentBuilder
       end
       if in_stock_items.count{|li| !li.consolidatable} < 1
         #Woo-hoo! Let's consolidate
-        line_items.each{|li| li.ship_status = :drop_ship if li.ship_status == :in_stock}
+        in_stock_items.each{|li| li.ship_status = :drop_ship}
       end
     end
 
