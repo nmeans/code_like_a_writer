@@ -30,14 +30,16 @@ class ShipmentBuilder
   end
 
   def build_shipments_by_ship_status
-    if consolidate_to_drop_ships?
-      in_stock_items.each{|li| li.ship_status = :drop_ship}
-    end
+    consolidate_to_drop_ships if consolidate_to_drop_ships?
 
     line_items.each do |li|
       create_group_if_necessary_and_insert( shipments, li.ship_status, li.store_id,
                                             li.ship_status == :drop_ship ? li.vendor_id : li.store_id, li.line_item )
     end
+  end
+
+  def consolidate_to_drop_ships
+    in_stock_items.each{|li| li.ship_status = :drop_ship}
   end
 
   def consolidate_to_drop_ships?
