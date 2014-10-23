@@ -5,12 +5,13 @@ class ShipmentBuilder
   # drop-shipped from a vendors warehouse.
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  attr_reader :line_items, :single_shipment, :shipments
+  attr_reader :line_items, :single_shipment, :shipments, :shipment_list
 
   def initialize(line_items, single_shipment = false)
     @line_items = line_items
     @single_shipment = single_shipment
     @shipments = []
+    @shipment_list = ShipmentList.new(shipments)
   end
 
   def build_shipments
@@ -51,27 +52,34 @@ class ShipmentBuilder
   end
 
   def assign_items_to_shipments
-    line_items.each do |li|
-      create_group_if_necessary_and_insert( shipments, li.ship_status, li.store_id,
-                                            li.ship_status == :drop_ship ? li.vendor_id : li.store_id, li.line_item )
-    end
+    line_items.each{|li| shipment_list.assign_to_shipment(li)}
   end
 
-  def create_group_if_necessary_and_insert( shipments, key, store_id, shipper_id, order_line_item)
-    found = false
-    shipments.each do |shipment|
-      if shipment.shipment_type == key && shipment.shipper_id == shipper_id && shipment.store_id == store_id
-        shipment.line_items << order_line_item
-        found = true
+  class ShipmentList
+    attr_accessor :shipments
+
+    def initialize(shipments)
+      @shipments = shipments
+    end
+
+    def assign_to_shipment(line_item)
+      shipment = find_or_create_shipment(line_item.ship_status, line_item.vendor_id)
+      shipment.line_items << line_item
+    end
+
+    def find_or_create_shipment(type, shipper_id)
+      find_shipment(type, shipper_id) || create_shipment(type, shipper_id)
+    end
+
+    def find_shipment(type, shipper_id)
+      shipments.find do |shipment|
+        shipment.shipment_type == type && (shipment.shipper_id == shipper_id || shipment.shipment_type != :drop_ship)
       end
     end
-    if found == false
-      shipment = Shipment.new
-      shipment.shipment_type = key
-      shipment.shipper_id = shipper_id
-      shipment.store_id = store_id
-      shipment.line_items << order_line_item
-      shipments << shipment
+
+    def create_shipment(type, shipper_id)
+      shipments << new_shipment = Shipment.new(shipment_type: type, shipper_id: shipper_id, store_id: 1)
+      new_shipment
     end
   end
 end
