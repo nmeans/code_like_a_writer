@@ -14,25 +14,19 @@ class ShipmentBuilder
   end
 
   def build_shipments
-    unless single_shipment
-      build_shipments_by_ship_status
-    else
-      build_consolidated_shipment
-    end
+    optimize_consolidation
+    assign_items_to_shipments
 
     return shipments
   end
 
-  def build_consolidated_shipment
-    line_items.each do |line_item|
-      line_item.ship_status = :consolidated
-    end
-    assign_items_to_shipments
+  def optimize_consolidation
+    consolidate_to_single_shipment if single_shipment
+    consolidate_to_drop_ships if consolidate_to_drop_ships?
   end
 
-  def build_shipments_by_ship_status
-    consolidate_to_drop_ships if consolidate_to_drop_ships?
-    assign_items_to_shipments
+  def consolidate_to_single_shipment
+    line_items.each { |li| li.ship_status = :consolidated }
   end
 
   def consolidate_to_drop_ships
