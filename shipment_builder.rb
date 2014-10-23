@@ -25,8 +25,9 @@ class ShipmentBuilder
 
   def build_consolidated_shipment
     line_items.each do |line_item|
-      create_group_if_necessary_and_insert( shipments, :consolidated, line_item.store_id, line_item.store_id, line_item)
+      line_item.ship_status = :consolidated
     end
+    assign_items_to_shipments
   end
 
   def build_shipments_by_ship_status
